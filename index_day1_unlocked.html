@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AdventnÌ kalend·Y</title>
+  <title>Adventn√≠ kalend√°Y</title>
   <style>
     :root{--bg:#f3f4f6;--card:#fff;--locked:#ddd;--accent:#2b6cb0}
     body{font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);margin:0;display:flex;flex-direction:column;
@@ -26,22 +26,25 @@
   </style>
 </head>
 <body>
-  <h1>AdventnÌ kalend·Y</h1>
-  <p class="desc">Klikni na dneanÌ okÈnko (nebo staraÌ). OkÈnka z budoucnosti jsou zablokovan·.</p>
+  <h1>Adventn√≠ kalend√°Y</h1>
+  <p class="desc">Klikni na dnean√≠ ok√©nko (nebo stara√≠). Ok√©nka z budoucnosti jsou zablokovan√°.</p>
 
   <div class="grid" id="grid"></div>
 
   <div class="controls">
-    <button id="teacherBtn">Uitel - odemknout</button>
-    <button id="downloadTemplate">St·hnout HTML (upravit odkazy)</button>
+    <button id="teacherBtn">U
+itel - odemknout</button>
+    <button id="downloadTemplate">St√°hnout HTML (upravit odkazy)</button>
   </div>
 
-  <p class="note"><strong>Instrukce:</strong> V souboru jsou v poli <code>contents</code> 24 polo~ek. Nahra URL nahr·vkami (mp3, m4a) nebo odkazem na soubor dostupn˝ z poÌtae/sÌt. Pro lok·lnÌ soubory napia relativnÌ cestu (napY. <code>audio/day1.mp3</code>).</p>
+  <p class="note"><strong>Instrukce:</strong> V souboru jsou v poli <code>contents</code> 24 polo~ek. Nahra URL nahr√°vkami (mp3, m4a) nebo odkazem na soubor dostupn√Ω z po
+√≠ta
+e/s√≠t. Pro lok√°ln√≠ soubory napia relativn√≠ cestu (napY. <code>audio/day1.mp3</code>).</p>
 
   <script>
-    // -- NASTAVENÕ: sem vlo~ konkrÈtnÌ URL souboro pro ka~d˝ den (1..24) --
-    // Mo~ea pou~Ìt URL k mp3, m4a, pYÌpadn k hostovan˝m souborom (Dropbox, Google Drive - pozor na sdÌlenÌ),
-    // nebo relativnÌ cesty k lok·lnÌm souborom (pokud budea otevÌrat HTML ze stejnÈ slo~ky).
+    // -- NASTAVEN√ç: sem vlo~ konkr√©tn√≠ URL souboro pro ka~d√Ω den (1..24) --
+    // Mo~ea pou~√≠t URL k mp3, m4a, pY√≠padn k hostovan√Ωm souborom (Dropbox, Google Drive - pozor na sd√≠len√≠),
+    // nebo relativn√≠ cesty k lok√°ln√≠m souborom (pokud budea otev√≠rat HTML ze stejn√© slo~ky).
         const contents = {
       1: "audio/1.mp3",
       2: "audio/2.mp3",
@@ -69,20 +72,25 @@
       24: "audio/24.mp3",
     };
 
-    // -- Nechte to tak nebo zmHte heslo; uitel mo~e zadat toto heslo pro odemknutÌ vaech dnÌ
+    // -- Nechte to tak nebo zmHte heslo; u
+itel mo~e zadat toto heslo pro odemknut√≠ vaech dn√≠
     const TEACHER_CODE = "letmein123";
 
-    // vytvoYenÌ gridu
+    // vytvoYen√≠ gridu
     const grid = document.getElementById('grid');
 
-    // currentDay: pokud nenÌ prosinec, currentDay=0 (zablokov·no). Pokud je prosinec, pou~ije se den v msÌci.
+    // currentDay: pokud nen√≠ prosinec, currentDay=0 (zablokov√°no). Pokud je prosinec, pou~ije se den v ms√≠ci.
     const now = new Date();
-    // Pozn·mka: klientsk· str·nka bere as prohlÌ~ee. Pokud chcete pevnou asovou zÛnu (Praha), ujistte se, ~e zaYÌzenÌ m· spr·vn˝ as.
-    const currentMonth = now.getMonth(); // prosinec === 11
+    // Pozn√°mka: klientsk√° str√°nka bere 
+as prohl√≠~e
+e. Pokud chcete pevnou 
+asovou z√≥nu (Praha), ujistte se, ~e zaY√≠zen√≠ m√° spr√°vn√Ω 
+as.
+    const currentMonth = now.getMonth()+1; // prosinec === 11
     const currentDate = 1;
     const today = 1;
 
-    // load opened state z localStorage tak aby po otevYenÌ zostalo otevYenÈ
+    // load opened state z localStorage tak aby po otevYen√≠ zostalo otevYen√©
     let opened = [1];
 
     function saveOpened(){ localStorage.setItem('advent_opened', JSON.stringify(opened)); }
@@ -116,7 +124,7 @@
       // Safety: can't open future days unless teacher override used
       const allowed = (d <= today) || opened.includes(d);
       if (!allowed) {
-        alert("Toto okÈnko je jeat zablokovanÈ. OtevÌr· se a~ v prosinci, v dan˝ den.");
+        alert("Toto ok√©nko je jeat zablokovan√©. Otev√≠r√° se a~ v prosinci, v dan√Ω den.");
         return;
       }
       if (!opened.includes(d)) {
@@ -151,15 +159,15 @@ audio.style.width = '100%';
 
 // play/pause button
 const btn = document.createElement('button');
-btn.textContent = "∂";
+btn.textContent = "¬∂";
 btn.style.marginBottom = "6px";
 btn.onclick = () => {
     if (audio.paused) {
         audio.play();
-        btn.textContent = "¯";
+        btn.textContent = "√∏";
     } else {
         audio.pause();
-        btn.textContent = "∂";
+        btn.textContent = "¬∂";
     }
 };
 
@@ -168,7 +176,7 @@ container.appendChild(audio);
 
       } else {
         const msg = document.createElement('div');
-        msg.textContent = "}·dn˝ obsah. Nahrate URL v poli 'contents' v HTML souboru.";
+        msg.textContent = "}√°dn√Ω obsah. Nahrate URL v poli 'contents' v HTML souboru.";
         msg.style.fontSize = '13px';
         container.appendChild(msg);
       }
@@ -184,9 +192,13 @@ container.appendChild(audio);
       cell.appendChild(container);
     }
 
-    // uitelsk˝ re~im (odemenÌ vaech dnÌ)
+    // u
+itelsk√Ω re~im (odem
+en√≠ vaech dn√≠)
     document.getElementById('teacherBtn').addEventListener('click', ()=>{
-      const code = prompt("Zadejte uitelsk˝ kÛd pro odemenÌ vaech dnÌ:");
+      const code = prompt("Zadejte u
+itelsk√Ω k√≥d pro odem
+en√≠ vaech dn√≠:");
       if (!code) return;
       if (code === TEACHER_CODE) {
         // odemknout vaechny dny
@@ -196,11 +208,11 @@ container.appendChild(audio);
         saveOpened();
         location.reload();
       } else {
-        alert("`patn˝ kÛd.");
+        alert("`patn√Ω k√≥d.");
       }
     });
 
-    // mo~nost st·hnout aktu·lnÌ HTML (u~ivatelsky upravit odkazy mimo tento n·stroj)
+    // mo~nost st√°hnout aktu√°ln√≠ HTML (u~ivatelsky upravit odkazy mimo tento n√°stroj)
     document.getElementById('downloadTemplate').addEventListener('click', ()=>{
       const blob = new Blob([document.documentElement.outerHTML], {type: 'text/html'});
       const url = URL.createObjectURL(blob);
