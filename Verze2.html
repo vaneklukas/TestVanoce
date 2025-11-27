@@ -255,10 +255,21 @@
         const src = contents[d];
         if (src) {
             const audio = document.createElement('audio');
-            audio.controls = true;
-            audio.autoplay = false;
-            audio.src = src;
-            audio.style.width = '100%';
+audio.controls = true;
+audio.autoplay = false;
+audio.src = src;
+audio.style.width = '100%';
+
+// Přidáme error handling
+audio.onerror = (e) => {
+    console.error('Chyba při načítání audia:', e);
+    console.log('Pokus o načtení URL:', src);
+};
+
+audio.onloadeddata = () => {
+    console.log('Audio úspěšně načteno:', src);
+};
+
 
             const btn = document.createElement('button');
             btn.className = 'audio-button';
