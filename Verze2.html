@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Adventní kalendář</title>
+    <style>
+        :root {
+            --bg: #f3f4f6;
+            --card: #fff;
+            --locked: #ddd;
+            --accent: #c41e3a; /* Vánoční červená */
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 28px;
+        }
+
+        h1 {
+            margin: 6px 0 18px;
+            font-size: 32px;
+            color: #c41e3a;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .desc {
+            margin: 0 0 18px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(6, 92px);
+            gap: 12px;
+            max-width: 620px;
+        }
+
+        .cell {
+            width: 92px;
+            height: 92px;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            border: 2px solid #c41e3a;
+            transition: transform 0.2s;
+        }
+
+        .cell:hover {
+            transform: scale(1.05);
+        }
+
+        .cell.locked {
+            background: var(--locked);
+            cursor: not-allowed;
+            opacity: 0.8;
+            border: 2px solid #999;
+        }
+
+        .cell.opened {
+            background: linear-gradient(135deg, #fff 0%, #fef3c7 100%);
+            border: 2px solid #2b965c;
+        }
+
+        .content {
+            position: absolute;
+            inset: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6px;
+        }
+
+        .daynum {
+            pointer-events: none;
+            color: #c41e3a;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 0;
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #a01830;
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: repeat(4, 80px);
+                gap: 8px;
+            }
+            .cell {
+                width: 80px;
+                height: 80px;
+                font-size: 20px;
+            }
+        }
+
+        .audio-button {
+            background: #2b965c;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .audio-button:hover {
+            background: #227748;
+        }
+    </style>
+</head>
+<body>
+<h1>Adventní kalendář</h1>
+<p class="desc">Klikni na dnešní okénko (nebo starší). Okénka z budoucnosti jsou zamčená.</p>
+
+<div class="grid" id="grid"></div>
+
+<div class="controls" style="margin-top: 20px;">
+    <button id="teacherBtn">Učitel - odemknout</button>
+</div>
+
+<script>
+    // Nastavení pro jednotlivé dny (1-24)
+    const contents = {
+        1: "audio/1.mp3",
+        2: "audio/2.mp3",
+        3: "audio/3.mp3",
+        4: "audio/4.mp3",
+        5: "audio/5.mp3",
+        6: "audio/6.mp3",
+        7: "audio/7.mp3",
+        8: "audio/8.mp3",
+        9: "audio/9.mp3",
+        10: "audio/10.mp3",
+        11: "audio/11.mp3",
+        12: "audio/12.mp3",
+        13: "audio/13.mp3",
+        14: "audio/14.mp3",
+        15: "audio/15.mp3",
+        16: "audio/16.mp3",
+        17: "audio/17.mp3",
+        18: "audio/18.mp3",
+        19: "audio/19.mp3",
+        20: "audio/20.mp3",
+        21: "audio/21.mp3",
+        22: "audio/22.mp3",
+        23: "audio/23.mp3",
+        24: "audio/24.mp3",
+    };
+
+    const TEACHER_CODE = "letmein123";
+    let teacherModeActive = false;
+
+    const grid = document.getElementById('grid');
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentDate = now.getDate();
+    const today = currentMonth === 11 ? currentDate : 0;
+
+    let opened = [];
+    try {
+        const saved = localStorage.getItem('advent_opened');
+        if (saved) opened = JSON.parse(saved);
+        teacherModeActive = localStorage.getItem('teacher_mode') === 'true';
+        if (teacherModeActive) {
+            document.getElementById('teacherBtn').textContent = "Zamknout kalendář";
+            document.getElementById('teacherBtn').style.background = "#2b965c";
+        }
+    } catch (e) {
+        console.error('Chyba při načítání stavu:', e);
+    }
+
+    function saveOpened() {
+        localStorage.setItem('advent_opened', JSON.stringify(opened));
+        localStorage.setItem('teacher_mode', teacherModeActive);
+    }
+
+    for (let d = 1; d <= 24; d++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        const num = document.createElement('div');
+        num.className = 'daynum';
+        num.textContent = d;
+        cell.appendChild(num);
+
+        const isAllowed = (d <= today) || opened.includes(d);
+
+        if (!isAllowed) {
+            cell.classList.add('locked');
+        } else {
+            cell.addEventListener('click', () => openDay(d, cell));
+        }
+
+        if (opened.includes(d)) {
+            cell.classList.add('opened');
+            showContent(d, cell);
+        }
+
+        grid.appendChild(cell);
+    }
+
+    function openDay(d, cell) {
+        const allowed = (d <= today) || opened.includes(d);
+        if (!allowed) {
+            alert("Toto okénko je ještě zamčené. Otevře se až v prosinci, v daný den.");
+            return;
+        }
+        if (!opened.includes(d)) {
+            opened.push(d);
+            saveOpened();
+        }
+        cell.classList.remove('locked');
+        cell.classList.add('opened');
+        showContent(d, cell);
+    }
+
+    function showContent(d, cell) {
+        cell.innerHTML = '';
+        const container = document.createElement('div');
+        container.className = 'content';
+
+        const title = document.createElement('div');
+        title.style.fontSize = '14px';
+        title.style.marginBottom = '8px';
+        title.style.fontWeight = 'bold';
+        title.textContent = 'Den ' + d;
+        container.appendChild(title);
+
+        const src = contents[d];
+        if (src) {
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.autoplay = false;
+            audio.src = src;
+            audio.style.width = '100%';
+
+            const btn = document.createElement('button');
+            btn.className = 'audio-button';
+            btn.textContent = "▶";
+            btn.onclick = () => {
+                if (audio.paused) {
+                    audio.play();
+                    btn.textContent = "⏸";
+                } else {
+                    audio.pause();
+                    btn.textContent = "▶";
+                }
+            };
+
+            container.appendChild(btn);
+            container.appendChild(audio);
+        } else {
+            const msg = document.createElement('div');
+            msg.textContent = "Žádný obsah není k dispozici.";
+            msg.style.fontSize = '13px';
+            container.appendChild(msg);
+        }
+
+        cell.appendChild(container);
+    }
+
+    document.getElementById('teacherBtn').addEventListener('click', () => {
+        if (!teacherModeActive) {
+            // Odemykání
+            const code = prompt("Zadejte učitelský kód pro odemčení všech dní:");
+            if (!code) return;
+            if (code === TEACHER_CODE) {
+                teacherModeActive = true;
+                for (let d = 1; d <= 24; d++) {
+                    if (!opened.includes(d)) opened.push(d);
+                }
+                saveOpened();
+                document.getElementById('teacherBtn').textContent = "Zamknout kalendář";
+                document.getElementById('teacherBtn').style.background = "#2b965c";
+                location.reload();
+            } else {
+                alert("Špatný kód.");
+            }
+        } else {
+            // Zamykání - vrátí do původního stavu podle data
+            teacherModeActive = false;
+            opened = [];
+            // Ponechá otevřená pouze okénka podle aktuálního data
+            for (let d = 1; d <= today; d++) {
+                opened.push(d);
+            }
+            saveOpened();
+            document.getElementById('teacherBtn').textContent = "Učitel - odemknout";
+            document.getElementById('teacherBtn').style.background = "var(--accent)";
+            location.reload();
+        }
+    });
+</script>
+</body>
+</html>
