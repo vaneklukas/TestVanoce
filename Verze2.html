@@ -125,14 +125,21 @@
         }
 
         .audio-button {
-            background: #2b965c;
-            margin-bottom: 8px;
-            font-size: 16px;
-        }
+    padding: 12px 24px;
+    background: #2b965c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    margin: 8px 0;
+    width: 80%;
+}
 
-        .audio-button:hover {
-            background: #227748;
-        }
+.audio-button:hover {
+    background: #227748;
+}
+
     </style>
 </head>
 <body>
@@ -241,60 +248,64 @@
     }
 
     function showContent(d, cell) {
-        cell.innerHTML = '';
-        const container = document.createElement('div');
-        container.className = 'content';
+    cell.innerHTML = '';
+    const container = document.createElement('div');
+    container.className = 'content';
 
-        const title = document.createElement('div');
-        title.style.fontSize = '14px';
-        title.style.marginBottom = '8px';
-        title.style.fontWeight = 'bold';
-        title.textContent = 'Den ' + d;
-        container.appendChild(title);
+    const title = document.createElement('div');
+    title.style.fontSize = '14px';
+    title.style.marginBottom = '8px';
+    title.style.fontWeight = 'bold';
+    title.textContent = 'Den ' + d;
+    container.appendChild(title);
 
-        const src = contents[d];
-        if (src) {
-            const audio = document.createElement('audio');
-audio.controls = true;
-audio.autoplay = false;
-audio.src = src;
-audio.style.width = '100%';
+    const src = contents[d];
+    if (src) {
+        const audio = new Audio(src); // Vytvoříme novou instanci
+        
+        const btn = document.createElement('button');
+        btn.className = 'audio-button';
+        btn.textContent = "▶";
+        
+        // Přidáme sledování stavu přehrávání
+        let isPlaying = false;
+        
+        btn.onclick = () => {
+            if (!isPlaying) {
+                audio.play()
+                    .then(() => {
+                        console.log('Přehrávání začalo');
+                        btn.textContent = "⏸";
+                        isPlaying = true;
+                    })
+                    .catch(error => {
+                        console.error('Chyba při přehrávání:', error);
+                        alert('Nepodařilo se přehrát zvuk');
+                    });
+            } else {
+                audio.pause();
+                btn.textContent = "▶";
+                isPlaying = false;
+            }
+        };
 
-// Přidáme error handling
-audio.onerror = (e) => {
-    console.error('Chyba při načítání audia:', e);
-    console.log('Pokus o načtení URL:', src);
-};
-
-audio.onloadeddata = () => {
-    console.log('Audio úspěšně načteno:', src);
-};
-
-
-            const btn = document.createElement('button');
-            btn.className = 'audio-button';
+        // Přidáme event listener pro ukončení přehrávání
+        audio.onended = () => {
             btn.textContent = "▶";
-            btn.onclick = () => {
-                if (audio.paused) {
-                    audio.play();
-                    btn.textContent = "⏸";
-                } else {
-                    audio.pause();
-                    btn.textContent = "▶";
-                }
-            };
+            isPlaying = false;
+        };
 
-            container.appendChild(btn);
-            container.appendChild(audio);
-        } else {
-            const msg = document.createElement('div');
-            msg.textContent = "Žádný obsah není k dispozici.";
-            msg.style.fontSize = '13px';
-            container.appendChild(msg);
-        }
-
-        cell.appendChild(container);
+        container.appendChild(btn);
+    } else {
+        const msg = document.createElement('div');
+        msg.textContent = "Žádný obsah není k dispozici.";
+        msg.style.fontSize = '13px';
+        container.appendChild(msg);
     }
+
+    cell.appendChild(container);
+}
+
 
     document.getElementById('teacherBtn').addEventListener('click', () => {
         if (!teacherModeActive) {
