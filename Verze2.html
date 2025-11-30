@@ -213,7 +213,7 @@
         cell.className = 'cell';
         const num = document.createElement('div');
         num.className = 'daynum';
-        num.textContent = d;
+        num.textContent = d+'.12.';
         cell.appendChild(num);
 
         const isAllowed = (d <= today) || opened.includes(d);
